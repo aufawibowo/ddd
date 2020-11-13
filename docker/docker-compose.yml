@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  database:
+    image: mysql
+    container_name: a7pro-database
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: a7pro
+      MYSQL_USER: a7pro
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+  redis:
+    image: redis
+    command: redis-server
+    container_name: a7pro-redis
+    ports:
+      - "6379:6379"
+  web:
+    image: mileschou/phalcon:7.4-apache
+    container_name: a7pro-backend
+    restart: always
+    build:
+      context: .
+      dockerfile: apache.dockerfile
+    links:
+      - database
+    volumes:
+      - /mnt/c/Users/muhau/a7pro-backend:/var/www/html/
+      - ./a7pro.conf:/etc/apache2/sites-available/000-default.conf
+    ports:
+      - "8080:80"
+    stdin_open: true
+    tty: true
